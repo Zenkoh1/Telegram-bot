@@ -15,10 +15,10 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger()
 MONTH_PAY = 2.50
 # Getting mode, so we could define run function for local and Heroku setup
-"""mode = os.getenv("MODE")
-TOKEN = os.getenv("TOKEN")"""
-mode = 'dev'
-TOKEN = '1579241899:AAGHi1hIOaePkwkZeSRDRAjZi2-FAUBI_WI'
+mode = os.getenv("MODE")
+TOKEN = os.getenv("TOKEN")
+"""mode = 'dev'
+TOKEN = '1579241899:AAGHi1hIOaePkwkZeSRDRAjZi2-FAUBI_WI'"""
 if mode == "dev":
     def run(updater):
         updater.start_polling()
