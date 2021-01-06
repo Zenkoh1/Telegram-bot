@@ -3,11 +3,11 @@ import os
 import random
 import sys
 import redis
-from datetime import date
+from datetime import datetime
 from telegram.ext import Updater, CommandHandler
 from telegram.error import (TelegramError, Unauthorized, BadRequest, 
                             TimedOut, ChatMigrated, NetworkError)
-from datetime import date
+import pytz
 
 # Enabling logging
 logging.basicConfig(level=logging.INFO,
@@ -175,16 +175,18 @@ def clear(update, context):
     
 
 def check_date(update, context):
-    today = date.today()
-    month = today.month
-    year = int(str(today.year)[2:])
+    mytimezone=pytz.timezone("Asia/Singapore")
+    today = datetime.today()
+    today_sg = mytimezone.localize(today)
+    month = today_sg.month
+    year = int(str(today_sg.year)[2:])
     new_date = f"{month:02d} {year:02d}"
     date_hist = client.lrange('added_dates',0, -1)
     
     if new_date not in date_hist:
-        add_date(update, new_date)
+        add_date(update, new_date, today_sg)
 
-def add_date(update, new_date):
+def add_date(update, new_date, today_sg):
     client.rpush('added_dates', new_date)
     info_dict = client.hgetall('money_owed')
     name_list = info_dict.keys()
@@ -192,7 +194,7 @@ def add_date(update, new_date):
         client.hincrbyfloat('money_owed', name, MONTH_PAY)
         client.hincrby('dates', name, 1)
 
-    show_date = date.today().strftime('%d %B %Y')
+    show_date = today_sg.strftime('%d %B %Y')
     msg = f"It is {show_date} friends, pls pay Jarryl ${MONTH_PAY:.2f} :D"
     update.message.reply_text(msg, quote = False)
     
@@ -200,11 +202,11 @@ if __name__ == '__main__':
     client = redis.Redis(
         host= 'redis-14313.c1.us-west-2-2.ec2.cloud.redislabs.com',
         port= '14313',
-        password = REDIS_PASS)
-
+        password = REDIS_PASS,
+        decode_responses= True)
 
     
-    
+
     logger.info("Starting bot")
     updater = Updater(TOKEN)
 
