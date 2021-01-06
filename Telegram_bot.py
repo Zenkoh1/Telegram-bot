@@ -52,7 +52,8 @@ def random_handler(update, context):
 
 
 def get_info(update, context):
-    
+    update.message.reply_text('help', parse_mode = 'MarkdownV2', quote = False)
+
     if len(context.args) == 0:
         info_dict = client.hgetall('money_owed')
         
