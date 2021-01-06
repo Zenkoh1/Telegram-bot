@@ -200,7 +200,7 @@ if __name__ == '__main__':
     client = redis.Redis(
         host= 'redis-14313.c1.us-west-2-2.ec2.cloud.redislabs.com',
         port= '14313',
-        Password = REDIS_PASS)
+        password = REDIS_PASS)
 
 
     
