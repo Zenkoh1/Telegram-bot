@@ -185,7 +185,7 @@ def check_date(update, context):
     new_date = f"{month:02d} {year:02d}"
     date_hist = client.lrange('added_dates',0, -1)
 
-    threading.Timer(5.0, check_date).start()
+    threading.Timer(5.0, check_date, [update, context]).start()
     if new_date not in date_hist:
         add_date(update, new_date, today_sg)
 
