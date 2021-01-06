@@ -17,6 +17,7 @@ MONTH_PAY = 2.50
 # Getting mode, so we could define run function for local and Heroku setup
 mode = os.getenv("MODE")
 TOKEN = os.getenv("TOKEN")
+REDIS_PASS = os.getenv("REDIS_PASS")
 
 if mode == "dev":
     def run(updater):
@@ -196,7 +197,10 @@ def add_date(update, new_date):
     update.message.reply_text(msg, quote = False)
     
 if __name__ == '__main__':
-    client = redis.Redis(host= '127.0.0.1', port = 6379, decode_responses= True)
+    client = redis.Redis(
+        host= 'redis-14313.c1.us-west-2-2.ec2.cloud.redislabs.com',
+        port= '14313',
+        Password = REDIS_PASS)
 
 
     
