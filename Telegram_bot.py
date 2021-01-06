@@ -37,20 +37,7 @@ else:
     logger.error("No MODE specified!")
     sys.exit(1)
 
-
-def start_handler(update, context):
-    # Creating a handler-function for /start command 
-    logger.info("User {} started bot".format(update.effective_user["id"]))
-    update.message.reply_text("Hello from Python!\nPress /random to get random number")
-
-
-def random_handler(update, context):
-    # Creating a handler-function for /random command
-    number = random.randint(0, 10)
-    logger.info("User {} randomed number {}".format(update.effective_user["id"], number))
-    update.message.reply_text("Random number: {}".format(number))
     
-
 
 
 def get_info(update, context):
@@ -102,16 +89,6 @@ def get_info(update, context):
 
         update.message.reply_text(msg, parse_mode = 'MarkdownV2', quote = False)
 
-def test(update, context):
-    table = """
-            \| Tables   \|      Are      \|  Cool \|
-            \|----------\|---------------\|-------\|
-            \| col 1 is \|  left-aligned \| $1600 \|
-            \| col 2 is \|    centered   \|   $12 \|
-            \| col 3 is \| right-aligned \|    $1 \|
-            """
-    
-    update.message.reply_text(table, parse_mode = 'MarkdownV2', quote = False)
 
 
 
@@ -154,17 +131,17 @@ def get_dates(update, context):
 def clear(update, context):
     try:
         if len(context.args) == 1:
-            name = context.args[0].lower()
-            client.delete(f"{name}_dates")
+            name = context.args[0].title()
+            client.hset('dates', name, 0)
 
-            client.hset('money_owed', f'{name.title()}', 0)
+            client.hset('money_owed', name, 0)
 
         elif len(context.args) == 2:
             name = context.args[0].lower()
             num = int(context.args[1])
-            client.ltrim(f"{name}_dates", num, -1)
+            client.hincrby('dates', name, - num)
 
-            client.hincrbyfloat('money_owed', f'{name.title()}', - num  * MONTH_PAY)
+            client.hincrbyfloat('money_owed', name, - num  * MONTH_PAY)
 
         
 
@@ -185,7 +162,7 @@ def check_date(update, context):
     new_date = f"{month:02d} {year:02d}"
     date_hist = client.lrange('added_dates',0, -1)
 
-    threading.Timer(5.0, check_date, [update, context]).start()
+    threading.Timer(60 * 60, check_date, [update, context]).start()
     if new_date not in date_hist:
         add_date(update, new_date, today_sg)
 
@@ -213,12 +190,11 @@ if __name__ == '__main__':
     logger.info("Starting bot")
     updater = Updater(TOKEN)
 
-    updater.dispatcher.add_handler(CommandHandler("start", start_handler))
-    updater.dispatcher.add_handler(CommandHandler("random", random_handler))
+    
     updater.dispatcher.add_handler(CommandHandler("info", get_info))
     updater.dispatcher.add_handler(CommandHandler("dates", get_dates))
     updater.dispatcher.add_handler(CommandHandler("clear", clear))
-    updater.dispatcher.add_handler(CommandHandler("test", check_date))
+    updater.dispatcher.add_handler(CommandHandler("start_check", check_date))
     
     run(updater)
 
