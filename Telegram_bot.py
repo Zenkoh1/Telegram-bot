@@ -8,6 +8,7 @@ from telegram.ext import Updater, CommandHandler
 from telegram.error import (TelegramError, Unauthorized, BadRequest, 
                             TimedOut, ChatMigrated, NetworkError)
 import pytz
+import threading
 
 # Enabling logging
 logging.basicConfig(level=logging.INFO,
@@ -53,7 +54,7 @@ def random_handler(update, context):
 
 
 def get_info(update, context):
-    update.message.reply_text('help', parse_mode = 'MarkdownV2', quote = False)
+    logger.info("Getting info")
 
     if len(context.args) == 0:
         info_dict = client.hgetall('money_owed')
@@ -175,6 +176,7 @@ def clear(update, context):
     
 
 def check_date(update, context):
+    logger.info("Checking date")
     mytimezone=pytz.timezone("Asia/Singapore")
     today = datetime.today()
     today_sg = mytimezone.localize(today)
@@ -182,7 +184,8 @@ def check_date(update, context):
     year = int(str(today_sg.year)[2:])
     new_date = f"{month:02d} {year:02d}"
     date_hist = client.lrange('added_dates',0, -1)
-    
+
+    threading.Timer(5.0, check_date).start()
     if new_date not in date_hist:
         add_date(update, new_date, today_sg)
 
@@ -216,6 +219,7 @@ if __name__ == '__main__':
     updater.dispatcher.add_handler(CommandHandler("dates", get_dates))
     updater.dispatcher.add_handler(CommandHandler("clear", clear))
     updater.dispatcher.add_handler(CommandHandler("test", check_date))
+    
     run(updater)
 
     
