@@ -195,7 +195,7 @@ if __name__ == '__main__':
     updater.dispatcher.add_handler(CommandHandler("dates", get_dates))
     updater.dispatcher.add_handler(CommandHandler("paid", paid))
     updater.dispatcher.add_handler(CommandHandler("start_check", check_date))
-    updater.bot.send_message()
+    
     run(updater)
 
     
