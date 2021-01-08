@@ -128,7 +128,7 @@ def get_dates(update, context):
     update.message.reply_text(msg, parse_mode = 'MarkdownV2', quote = False)
 
     
-def clear(update, context):
+def paid(update, context):
     try:
         if len(context.args) == 1:
             name = context.args[0].title()
@@ -193,7 +193,7 @@ if __name__ == '__main__':
     
     updater.dispatcher.add_handler(CommandHandler("info", get_info))
     updater.dispatcher.add_handler(CommandHandler("dates", get_dates))
-    updater.dispatcher.add_handler(CommandHandler("paid", clear))
+    updater.dispatcher.add_handler(CommandHandler("paid", paid))
     updater.dispatcher.add_handler(CommandHandler("start_check", check_date))
     updater.bot.send_message()
     run(updater)
