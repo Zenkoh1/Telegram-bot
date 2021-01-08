@@ -137,7 +137,7 @@ def clear(update, context):
             client.hset('money_owed', name, 0)
 
         elif len(context.args) == 2:
-            name = context.args[0].lower()
+            name = context.args[0].title()
             num = int(context.args[1])
             client.hincrby('dates', name, - num)
 
@@ -193,9 +193,9 @@ if __name__ == '__main__':
     
     updater.dispatcher.add_handler(CommandHandler("info", get_info))
     updater.dispatcher.add_handler(CommandHandler("dates", get_dates))
-    updater.dispatcher.add_handler(CommandHandler("clear", clear))
+    updater.dispatcher.add_handler(CommandHandler("paid", clear))
     updater.dispatcher.add_handler(CommandHandler("start_check", check_date))
-    
+    updater.bot.send_message()
     run(updater)
 
     
