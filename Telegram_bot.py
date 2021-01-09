@@ -147,8 +147,7 @@ def paid(update, context):
 def check_date():
     
     mytimezone = pytz.timezone("Asia/Singapore")
-    today = datetime.today()
-    today_sg = today.replace(tzinfo= mytimezone)
+    today_sg = datetime.now(mytimezone)
     month = today_sg.month
     year = int(str(today_sg.year)[2:])
     new_date = f"{month:02d} {year:02d}"
