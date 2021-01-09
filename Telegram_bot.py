@@ -95,22 +95,6 @@ def get_info(update, context):
 
 def get_dates(update, context):
     logger.info(f"User {update.effective_user['id']} attempted to get dates")
-    """try:
-        if len(context.args) == 1:
-            name = context.args[0].lower()
-            date_list = client.lrange(f"{name}_dates", 0, -1)
-            msg = f'*__Monthly Payable \-  {name.title()}__*\n'
-            msg += '\n'.join(date_list)
-            update.message.reply_text(msg, parse_mode = 'MarkdownV2', quote = False)
-        elif len(context.args) == 0:
-            update.message.reply_text("Please enter a name:D", quote = False)
-        else:
-            update.message.reply_text("Please enter only one name:D", quote = False)
-    
-    except BadRequest: # not a valid entry
-       update.message.reply_text("Please enter a valid name:D", quote = False)"""
-
-    
     date_dict = client.hgetall('dates')
     msg = "*__No. of months owed__*\n"
 
@@ -136,13 +120,20 @@ def paid(update, context):
             client.hset('dates', name, 0)
 
             client.hset('money_owed', name, 0)
-
+            msg = f"{name} has paid off all his debt\."
         elif len(context.args) == 2:
             name = context.args[0].title()
             num = int(context.args[1])
             client.hincrby('dates', name, - num)
 
             client.hincrbyfloat('money_owed', name, - num  * MONTH_PAY)
+            msg = f"{name} has paid ${num * MONTH_PAY:.2f} for {num} month\(s\) worth of Spotify."
+            msg = msg.replace('.', '\.')
+
+        
+        update.message.reply_text(msg, parse_mode = 'MarkdownV2', quote = False)
+    
+    
 
         
 
