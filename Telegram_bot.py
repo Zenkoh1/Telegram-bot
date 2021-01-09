@@ -2,8 +2,9 @@ import logging
 import os
 import random
 import sys
-import redis
 from datetime import datetime
+import redis
+from telegram import Bot
 from telegram.ext import Updater, CommandHandler
 from telegram.error import (TelegramError, Unauthorized, BadRequest, 
                             TimedOut, ChatMigrated, NetworkError)
@@ -152,8 +153,8 @@ def paid(update, context):
     
     
 
-def check_date(update, context):
-    logger.info("Checking date")
+def check_date():
+    
     mytimezone=pytz.timezone("Asia/Singapore")
     today = datetime.today()
     today_sg = mytimezone.localize(today)
@@ -161,12 +162,12 @@ def check_date(update, context):
     year = int(str(today_sg.year)[2:])
     new_date = f"{month:02d} {year:02d}"
     date_hist = client.lrange('added_dates',0, -1)
-
-    threading.Timer(60 * 60, check_date, [update, context]).start()
+    logger.info(f"Checking date @ {today_sg}")
+    threading.Timer(60 * 60, check_date).start()
     if new_date not in date_hist:
-        add_date(update, new_date, today_sg)
+        add_date(new_date, today_sg)
 
-def add_date(update, new_date, today_sg):
+def add_date(new_date, today_sg):
     client.rpush('added_dates', new_date)
     info_dict = client.hgetall('money_owed')
     name_list = info_dict.keys()
@@ -176,7 +177,8 @@ def add_date(update, new_date, today_sg):
 
     show_date = today_sg.strftime('%d %B %Y')
     msg = f"It is {show_date} friends, pls pay Jarryl ${MONTH_PAY:.2f} :D"
-    update.message.reply_text(msg, quote = False)
+    #update.message.reply_text(msg, quote = False)
+    bot.send_message(chat_id = -485281991, text = msg)
     
 if __name__ == '__main__':
     client = redis.Redis(
@@ -189,7 +191,8 @@ if __name__ == '__main__':
 
     logger.info("Starting bot")
     updater = Updater(TOKEN)
-
+    bot = Bot(token=TOKEN)
+    check_date()
     
     updater.dispatcher.add_handler(CommandHandler("info", get_info))
     updater.dispatcher.add_handler(CommandHandler("dates", get_dates))
