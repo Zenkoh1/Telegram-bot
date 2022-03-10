@@ -176,8 +176,8 @@ def change_cost(update, context):
 
         
     
-    except BadRequest:
-        update.message.reply_text("Enter in the correct format", quote = False)
+    except BadRequest as e:
+        update.message.reply_text(f"Enter in the correct format {e}", quote = False)
 
 if __name__ == '__main__':
     client = redis.Redis(
