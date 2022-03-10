@@ -21,7 +21,7 @@ REDIS_PASS = os.getenv("REDIS_PASS")
 REDIS_NAME = os.getenv("REDIS_NAME")
 REDIS_PORT = os.getenv("REDIS_PORT")
 
-MONTH_PAY = 2.50 # One month's worth of spotify
+#MONTH_PAY = 2.50 # One month's worth of spotify
 
 if mode == "dev":
     def run(updater):
@@ -108,12 +108,13 @@ def paid(update, context):
             msg = f"{name} has paid off all his debt\."
 
         elif len(context.args) == 2:
+            cost = client.get('cost')
             name = context.args[0].title()
             num = int(context.args[1])
             client.hincrby('dates', name, - num)
-            client.hincrbyfloat('money_owed', name, - num  * MONTH_PAY)
+            client.hincrbyfloat('money_owed', name, - num  * cost)
 
-            msg = f"{name} has paid ${num * MONTH_PAY:.2f} for {num} month\(s\) worth of Spotify."
+            msg = f"{name} has paid ${num * cost:.2f} for {num} month\(s\) worth of Spotify."
             msg = msg.replace('.', '\.')
 
         elif len(context.args) > 2:
