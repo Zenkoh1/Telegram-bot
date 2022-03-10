@@ -168,8 +168,9 @@ def change_cost(update, context):
                  update.message.reply_text("Please enter a number", parse_mode = 'MarkdownV2', quote = False)
                  return
             client.set('cost', cost)
-            msg = f"The cost has been increase to ${cost} per month."
-            msg = msg.replace('.', '\.')
+            msg = f"The cost has been increased to ${cost} per month."
+            bot.send_message(chat_id = -485281991, text = msg)
+            return
 
         else:
             msg = f"Enter in the correct format"
