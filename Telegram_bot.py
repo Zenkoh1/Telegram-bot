@@ -147,13 +147,32 @@ def add_date(new_date, today_sg):
     name_list = info_dict.keys()
 
     for name in name_list:
-        client.hincrbyfloat('money_owed', name, MONTH_PAY)
+        client.hincrbyfloat('money_owed', name, client.get('cost'))
         client.hincrby('dates', name, 1)
 
     show_date = today_sg.strftime('%d %B %Y')
     msg = f"It is {show_date} friends, pls pay Jarryl ${MONTH_PAY:.2f} :D"
     bot.send_message(chat_id = -485281991, text = msg) #chat_id is for the spotify loan shark group
     
+
+def change_cost(update, context):
+    try:
+        if len(context.args) == 1 and type(context.args[0]) is int:
+            
+            cost = context.args[0]
+            client.set('cost', cost)
+            msg = f"The cost has been increase to ${cost} per month\."
+
+        else:
+            msg = f"Enter in the correct format"
+
+        update.message.reply_text(msg, parse_mode = 'MarkdownV2', quote = False)
+
+        
+    
+    except BadRequest:
+        update.message.reply_text("Please enter a valid name:D", quote = False)
+
 if __name__ == '__main__':
     client = redis.Redis(
         host= REDIS_NAME,
@@ -169,7 +188,7 @@ if __name__ == '__main__':
     updater.dispatcher.add_handler(CommandHandler("info", get_info))
     updater.dispatcher.add_handler(CommandHandler("dates", get_dates))
     updater.dispatcher.add_handler(CommandHandler("paid", paid))
-    
+    updater.dispatcher.add_handler(CommandHandler("change_cost", change_cost))
     run(updater)
 
     
