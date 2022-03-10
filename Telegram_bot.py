@@ -146,12 +146,13 @@ def add_date(new_date, today_sg):
     info_dict = client.hgetall('money_owed')
     name_list = info_dict.keys()
 
+    cost = client.get('cost')
     for name in name_list:
-        client.hincrbyfloat('money_owed', name, client.get('cost'))
+        client.hincrbyfloat('money_owed', name, cost)
         client.hincrby('dates', name, 1)
 
     show_date = today_sg.strftime('%d %B %Y')
-    msg = f"It is {show_date} friends, pls pay Jarryl ${MONTH_PAY:.2f} :D"
+    msg = f"It is {show_date} friends, pls pay Jarryl ${cost:.2f} :D"
     bot.send_message(chat_id = -485281991, text = msg) #chat_id is for the spotify loan shark group
     
 
