@@ -157,9 +157,15 @@ def add_date(new_date, today_sg):
 
 def change_cost(update, context):
     try:
-        if len(context.args) == 1 and type(context.args[0]) is int:
+        if len(context.args) == 1:
+
             
-            cost = context.args[0]
+            
+            try:
+                cost = float(context.args[0])
+            except ValueError:
+                 update.message.reply_text("Please enter a number", parse_mode = 'MarkdownV2', quote = False)
+                 return
             client.set('cost', cost)
             msg = f"The cost has been increase to ${cost} per month\."
 
@@ -171,7 +177,7 @@ def change_cost(update, context):
         
     
     except BadRequest:
-        update.message.reply_text("Please enter a valid name:D", quote = False)
+        update.message.reply_text("Enter in the correct format", quote = False)
 
 if __name__ == '__main__':
     client = redis.Redis(
@@ -188,7 +194,7 @@ if __name__ == '__main__':
     updater.dispatcher.add_handler(CommandHandler("info", get_info))
     updater.dispatcher.add_handler(CommandHandler("dates", get_dates))
     updater.dispatcher.add_handler(CommandHandler("paid", paid))
-    updater.dispatcher.add_handler(CommandHandler("change_cost", change_cost))
+    updater.dispatcher.add_handler(CommandHandler("change", change_cost))
     run(updater)
 
     
